@@ -29,7 +29,9 @@ apiRouter
 	});
 
 export const config = {
-	bodyParser: true,
+	api: {
+		bodyParser: true,
+	},
 };
 
 export default apiRouter.handler(middleware);

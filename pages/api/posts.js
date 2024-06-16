@@ -1,13 +1,15 @@
 import { createRouter } from "next-connect";
 import mongodb from "@/lib/mongodb";
 import postController from "@/controller/postController";
+import multer from "multer";
 
 const apiRouter = createRouter();
+const upload = multer();
 const middleware = {
 	onError(error, req, res) {
 		res.status(500).json({
 			status: false,
-			message: `internal server issue, ${error.message}`,
+			message: `onError internal server issue, ${error.message}`,
 		});
 	},
 	onNoMatch(req, res) {
@@ -19,17 +21,20 @@ const middleware = {
 };
 
 apiRouter
-	.get((req, res) => {
-		mongodb();
-		return postController.getPosts(req, res);
-	})
+	.use(upload.single("image"))
 	.post((req, res) => {
 		mongodb();
 		return postController.addPosts(req, res);
+	})
+	.get((req, res) => {
+		mongodb();
+		return postController.getPosts(req, res);
 	});
 
 export const config = {
-	bodyParser: false,
+	api: {
+		bodyParser: false,
+	},
 };
 
 export default apiRouter.handler(middleware);
