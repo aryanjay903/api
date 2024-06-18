@@ -4,7 +4,7 @@ import {
 	Card,
 	CardBody,
 	CardTitle,
-	Container,
+	Col,
 	Dropdown,
 	DropdownItem,
 	DropdownMenu,
@@ -13,8 +13,7 @@ import {
 	FormGroup,
 	Input,
 	Label,
-	NavItem,
-	NavLink,
+	Row,
 } from "reactstrap";
 import Layout from "@/component/Layout";
 import getConfig from "next/config";
@@ -54,12 +53,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => (
 	</div>
 );
 const Create = ({ technology }) => {
+	const [content, setContent] = useState([]);
+	const [postFields, setPostFields] = useState({});
 	const [isSidebarOpen, setSidebarOpen] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const [fields, setFields] = useState([]);
 	const router = useRouter();
 	const addField = (type) => () => {
 		setFields([...fields, { type, id: fields.length }]);
+	};
+	const removeField = (id) => () => {
+		setFields(fields.filter((field) => field.id !== id));
+	};
+	const handleChange = ({ target: { name, value } }) =>
+		setPostFields((prevState) => ({ ...prevState, [name]: value }));
+
+	const handleContent = (event) => {
+		const { name, value } = event.target;
+		setContent(() => [{ [name]: value }]);
 	};
 
 	const toggleDropdown = () => {
@@ -68,7 +79,6 @@ const Create = ({ technology }) => {
 	const toggleSidebar = () => {
 		setSidebarOpen(!isSidebarOpen);
 	};
-
 	return (
 		<>
 			{/* {!isSidebarOpen && (
@@ -86,29 +96,28 @@ const Create = ({ technology }) => {
 					<Card>
 						<CardBody>
 							<div className="d-flex justify-content-between mb-2">
-								<CardTitle tag="h5">Create Post</CardTitle>
-								<>
-									<Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-										<DropdownToggle>+ Add Field</DropdownToggle>
-										<DropdownMenu>
-											<DropdownItem onClick={addField("image")}>
-												Image
-											</DropdownItem>
-											<DropdownItem onClick={addField("heading")}>
-												Heading
-											</DropdownItem>
-											<DropdownItem onClick={addField("subheading")}>
-												Sub Heading
-											</DropdownItem>
-											<DropdownItem onClick={addField("paragraph")}>
-												Peragraph
-											</DropdownItem>
-											<DropdownItem onClick={addField("codebox")}>
-												Code-Box
-											</DropdownItem>
-										</DropdownMenu>
-									</Dropdown>
-								</>
+								<CardTitle tag="h2">Create Post</CardTitle>
+
+								<Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+									<DropdownToggle>+ Add Field</DropdownToggle>
+									<DropdownMenu>
+										<DropdownItem onClick={addField("image")}>
+											Image
+										</DropdownItem>
+										<DropdownItem onClick={addField("heading")}>
+											Heading
+										</DropdownItem>
+										<DropdownItem onClick={addField("subheading")}>
+											Sub Heading
+										</DropdownItem>
+										<DropdownItem onClick={addField("paragraph")}>
+											Peragraph
+										</DropdownItem>
+										<DropdownItem onClick={addField("codebox")}>
+											Code-Box
+										</DropdownItem>
+									</DropdownMenu>
+								</Dropdown>
 							</div>
 							<Card>
 								<CardBody>
@@ -126,6 +135,7 @@ const Create = ({ technology }) => {
 											id="title"
 											name="title"
 											placeholder="Enter Title"
+											onChange={handleChange}
 										/>
 									</FormGroup>
 									<FormGroup>
@@ -135,12 +145,21 @@ const Create = ({ technology }) => {
 											name="description"
 											id="description"
 											placeholder="Enter Description"
+											onChange={handleChange}
 										/>
 									</FormGroup>
 									<FormGroup>
 										<Label for="language_id">Language*</Label>
-										<Input type="select">
+										<Input
+											type="select"
+											name="language"
+											onChange={handleChange}
+										>
 											<option value="javascript">javascript</option>
+											<option value="php">php</option>
+											<option value="python">python</option>
+											<option value="java">java</option>
+											<option value="html">html</option>
 										</Input>
 									</FormGroup>
 								</CardBody>
@@ -149,25 +168,21 @@ const Create = ({ technology }) => {
 								{Object.values(fields).map((field) => {
 									const { type, id } = field;
 									const inputType =
-										type === "image"
-											? "file"
-											: type === "heading" || type === "subheading"
-											? "text"
-											: type === "paragraph" || type === "codebox"
-											? "textarea"
-											: null;
+										{
+											image: "file",
+											heading: "text",
+											subheading: "text",
+											paragraph: "textarea",
+											codebox: "textarea",
+										}[type] || null;
 									const labelText =
-										type === "image"
-											? "Image"
-											: type === "heading"
-											? "Heading"
-											: type === "subheading"
-											? "Sub Heading"
-											: type === "paragraph"
-											? "Peragraph"
-											: type === "codebox"
-											? "Code Box"
-											: null;
+										{
+											image: "Image",
+											heading: "Heading",
+											subheading: "Sub Heading",
+											paragraph: "Paragraph",
+											codebox: "Code Box",
+										}[type] || null;
 									const inputId = `${type}${id}`;
 									const inputName = `${type}`;
 									const isMultiple =
@@ -179,12 +194,26 @@ const Create = ({ technology }) => {
 										return (
 											<FormGroup key={id}>
 												<Label for={inputId}>{labelText}</Label>
-												<Input
-													type={inputType}
-													id={inputId}
-													name={inputName}
-													multiple={isMultiple}
-												/>
+												<Row>
+													<Col>
+														<Input
+															type={inputType}
+															id={inputId}
+															name={inputName}
+															multiple={isMultiple}
+															onChange={handleContent}
+														/>
+													</Col>
+													<Col xs="auto">
+														<Button
+															type="button"
+															color="danger"
+															onClick={removeField(id)}
+														>
+															DELETE
+														</Button>
+													</Col>
+												</Row>
 											</FormGroup>
 										);
 									}

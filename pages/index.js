@@ -35,6 +35,7 @@ const App = ({ technology, post }) => {
 	// 		const post = postResponse.data;
 	// 		// console.log(post.data);
 	// 		// console.log(technology.data);
+
 	// 		setPosts(post.data);
 	// 		setTechnology(technology.data);
 	// 	})();

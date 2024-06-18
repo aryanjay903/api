@@ -9,7 +9,9 @@ module.exports = {
 		});
 	},
 	addPosts: async (req, res) => {
-		const { title, description, language_id } = JSON.parse(req.body.data);
+		const { title, description, language_id, content } = JSON.parse(
+			req.body.data
+		);
 		if (!title || !description || !language_id || !req.files.main_image) {
 			const missingFields = [];
 			if (!title) missingFields.push("title");
