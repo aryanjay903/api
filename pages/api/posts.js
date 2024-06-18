@@ -1,10 +1,11 @@
 import { createRouter } from "next-connect";
 import mongodb from "@/lib/mongodb";
 import postController from "@/controller/postController";
-import multer from "multer";
+// import multer from "multer";
+import upload from "@/utils/imageUpload";
 
 const apiRouter = createRouter();
-const upload = multer();
+// const upload = multer();
 const middleware = {
 	onError(error, req, res) {
 		res.status(500).json({
@@ -21,7 +22,14 @@ const middleware = {
 };
 
 apiRouter
-	.use(upload.single("image"))
+	.use(
+		upload.fields([
+			{ name: "main_image", maxCount: 1 },
+			{ name: "image", maxCount: 10 },
+		])
+	)
+	// .use(upload.single("main_image"))
+	// .use(upload.array("image", 10))
 	.post((req, res) => {
 		mongodb();
 		return postController.addPosts(req, res);

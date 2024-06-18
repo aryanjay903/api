@@ -10,10 +10,10 @@ const contentSchema = new Schema({
 
 const postSchema = new Schema(
 	{
-		image: String,
+		main_image: String,
 		title: String,
 		description: String,
-		language_id: Schema.ObjectId,
+		language_id: { type: Schema.Types.ObjectId, ref: "technologies" },
 		content: [contentSchema],
 	},
 	{

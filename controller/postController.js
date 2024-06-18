@@ -10,7 +10,7 @@ module.exports = {
 	},
 	addPosts: async (req, res) => {
 		const { title, description, language_id } = JSON.parse(req.body.data);
-		if (!title || !description || !language_id || !req.file) {
+		if (!title || !description || !language_id || !req.files.main_image) {
 			const missingFields = [];
 			if (!title) missingFields.push("title");
 			if (!description) missingFields.push("description");
@@ -21,13 +21,18 @@ module.exports = {
 				message: `${missingFields.join(", ")} is required`,
 			});
 		}
+		const main_image = req.files.main_image;
+		const image = req.files.image;
+		const imageString = main_image[0].path
+			.replace(/^public\\/, "")
+			.replace(/\\/g, "/");
 		const data = {
 			title: title,
 			description: description,
 			language_id: language_id,
-			image: req.file,
+			main_image: imageString,
+			content: content,
 		};
-		// console.log(req.file);
 		// const post = await postModel.addPosts(data);
 		return res.status(200).json({
 			status: true,
